@@ -77,4 +77,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any issues or questions, please open an issue on the GitLab repository or contact [your email address].
+For any issues or questions, please open an issue on the GitLab repository or contact [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/shprd95).
