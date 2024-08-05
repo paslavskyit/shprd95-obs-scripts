@@ -14,7 +14,7 @@ function update_counter()
     local source = obs.obs_get_source_by_name(source_name)
     if source then
         local settings = obs.obs_data_create()
-        local display_text = "Смертей: " .. tostring(counter) -- Full text with prefix
+        local display_text = "Deaths: " .. tostring(counter) -- Full text with prefix
         obs.obs_data_set_string(settings, "text", display_text)
         obs.obs_source_update(source, settings)
         obs.obs_data_release(settings)
