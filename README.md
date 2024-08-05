@@ -77,4 +77,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any issues or questions, please open an issue on the GitLab repository or contact [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/shprd95).
+For any issues or questions, please open an issue on the GitLab repository or contact me on Telegram.
+<a href="https://t.me/shprd95"><img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" height="20"/></a>
