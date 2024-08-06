@@ -1,108 +1,83 @@
 obs = obslua
-
--- Text source name
 source_name = "DeathCounter"
-
--- File path to save the counter value
 file_path = "D:/Video Projects/OBS_Files/Scripts/death_counter.txt"
 
--- Death counter value
-counter = 0
+count = 0
+increment_hotkey_id = nil
+decrement_hotkey_id = nil
 
--- Function to update the text source
-function update_counter()
-    local source = obs.obs_get_source_by_name(source_name)
-    if source then
-        local settings = obs.obs_data_create()
-        local display_text = "Deaths: " .. tostring(counter) -- Full text with prefix
-        obs.obs_data_set_string(settings, "text", display_text)
-        obs.obs_source_update(source, settings)
-        obs.obs_data_release(settings)
-        obs.obs_source_release(source)
-    end
-end
-
--- Function to save the counter value to a file
-function save_counter()
-    local file, err = io.open(file_path, "w")
-    if file then
-        file:write(tostring(counter)) -- Save only the counter value
-        file:close()
-    else
-        print("Error opening file for writing: " .. err)
-    end
-end
-
--- Function to load the counter value from a file
-function load_counter()
-    local file, err = io.open(file_path, "r")
-    if file then
-        local value = file:read("*n") -- Read the numeric value
-        if value then
-            counter = value
-        end
-        file:close()
-    else
-        print("Error opening file for reading: " .. err)
-    end
-end
-
--- Function to handle increment key press
-function increment_hotkey_callback(pressed)
-    if pressed then
-        counter = counter + 1
-        update_counter()
-        save_counter()
-    end
-end
-
--- Function to handle decrement key press
-function decrement_hotkey_callback(pressed)
-    if pressed then
-        if counter > 0 then
-            counter = counter - 1
-            update_counter()
-            save_counter()
-        end
-    end
-end
-
--- Script description
 function script_description()
-    return "Increments or decrements a text source each time the hotkey is pressed, with a prefix. Saves and loads the counter value from a file."
+    return "A script to increment and decrement a death counter and save it to a file."
 end
 
--- Function to load script settings
+function update_text_source()
+    local source = obs.obs_get_source_by_name(source_name)
+    local settings = obs.obs_data_create()
+    obs.obs_data_set_string(settings, "text", "Deaths: " .. count)
+    obs.obs_source_update(source, settings)
+    obs.obs_data_release(settings)
+    obs.obs_source_release(source)
+end
+
+function increment_death_counter(pressed)
+    if pressed then
+        count = count + 1
+        update_text_source()
+        save_counter_value()
+    end
+end
+
+function decrement_death_counter(pressed)
+    if pressed then
+        count = count - 1
+        update_text_source()
+        save_counter_value()
+    end
+end
+
+function save_counter_value()
+    local file = io.open(file_path, "w")
+    if file then
+        file:write("Deaths: " .. count)
+        file:close()
+    end
+end
+
+function load_counter_value()
+    local file = io.open(file_path, "r")
+    if file then
+        local content = file:read("*all")
+        count = tonumber(content:match("Deaths: (%d+)")) or 0
+        file:close()
+    end
+end
+
 function script_load(settings)
-    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment Death Counter", increment_hotkey_callback)
-    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement Death Counter", decrement_hotkey_callback)
+    load_counter_value()
+    update_text_source()
 
-    local increment_hotkey_save_array = obs.obs_data_get_array(settings, "increment_death_counter")
-    obs.obs_hotkey_load(increment_hotkey_id, increment_hotkey_save_array)
-    obs.obs_data_array_release(increment_hotkey_save_array)
+    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment Death Counter", increment_death_counter)
+    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement Death Counter", decrement_death_counter)
+    
+    local hotkey_save_array = obs.obs_data_get_array(settings, "increment_death_counter")
+    obs.obs_hotkey_load(increment_hotkey_id, hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
 
-    local decrement_hotkey_save_array = obs.obs_data_get_array(settings, "decrement_death_counter")
-    obs.obs_hotkey_load(decrement_hotkey_id, decrement_hotkey_save_array)
-    obs.obs_data_array_release(decrement_hotkey_save_array)
-
-    load_counter() -- Load the counter value from the file
-    update_counter() -- Update the text source with the loaded counter value
+    hotkey_save_array = obs.obs_data_get_array(settings, "decrement_death_counter")
+    obs.obs_hotkey_load(decrement_hotkey_id, hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
 end
 
--- Function to save script settings
 function script_save(settings)
-    local increment_hotkey_save_array = obs.obs_hotkey_save(increment_hotkey_id)
-    obs.obs_data_set_array(settings, "increment_death_counter", increment_hotkey_save_array)
-    obs.obs_data_array_release(increment_hotkey_save_array)
+    local hotkey_save_array = obs.obs_hotkey_save(increment_hotkey_id)
+    obs.obs_data_set_array(settings, "increment_death_counter", hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
 
-    local decrement_hotkey_save_array = obs.obs_hotkey_save(decrement_hotkey_id)
-    obs.obs_data_set_array(settings, "decrement_death_counter", decrement_hotkey_save_array)
-    obs.obs_data_array_release(decrement_hotkey_save_array)
-
-    save_counter() -- Save the counter value to the file
+    hotkey_save_array = obs.obs_hotkey_save(decrement_hotkey_id)
+    obs.obs_data_set_array(settings, "decrement_death_counter", hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
 end
 
--- Function to set script defaults
 function script_defaults(settings)
-    obs.obs_data_set_default_int(settings, "counter", 0)
+    obs.obs_data_set_default_int(settings, "count", 0)
 end
