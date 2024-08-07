@@ -1,6 +1,6 @@
 obs = obslua
 
-source_name = "DeathCounter"
+source_name = "DeathCounter" -- Name of the text source (GDI+) in OBS to display the death counter
 count = 0
 increment_hotkey_id = nil
 decrement_hotkey_id = nil
@@ -24,7 +24,7 @@ function update_text_source()
     local source = obs.obs_get_source_by_name(source_name)
     if source then
         local settings = obs.obs_data_create()
-        obs.obs_data_set_string(settings, "text", "Deaths: " .. count)
+        obs.obs_data_set_string(settings, "text", "YourPrefix: " .. count) -- Customize the text format here in "quotes"
         obs.obs_source_update(source, settings)
         obs.obs_data_release(settings)
         obs.obs_source_release(source)
@@ -57,6 +57,7 @@ function script_load(settings)
     count = obs.obs_data_get_int(settings, "count")
     update_text_source()
 
+    -- Register hotkeys for incrementing and decrementing the counter. Bind the hotkeys in Settings >> Hotkeys
     increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment Death Counter", increment_death_counter)
     decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement Death Counter", decrement_death_counter)
 
