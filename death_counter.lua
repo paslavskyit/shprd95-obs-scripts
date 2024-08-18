@@ -23,7 +23,6 @@ end
 
 function populate_text_sources(combo)
     local sources = obs.obs_enum_sources()
-
     if sources == nil then
         print("Failed to enumerate sources")
         return
@@ -33,21 +32,38 @@ function populate_text_sources(combo)
         local source_name = obs.obs_source_get_name(source)
         local source_id = obs.obs_source_get_id(source)
 
-        if string.match(source_id, "^text_gdiplus") then
+        if string.match(source_id, "^text_gdiplus") or string.match(source_id, "^text_ft2") then
             obs.obs_property_list_add_string(combo, source_name, source_name)
         end
     end
+
+    -- No explicit release needed here as it's not a valid function
 end
 
 function script_defaults(settings)
-    obs.obs_data_set_default_string(settings, "text_source", "")
+    obs.obs_data_set_default_string(settings, "text_source", "-")
+    obs.obs_data_set_default_string(settings, "prefix", "-")
+    obs.obs_data_set_default_int(settings, "count", 0)
 end
 
 function script_update(settings)
-    source_name = obs.obs_data_get_string(settings, "source_name")
-    prefix = obs.obs_data_get_string(settings, "prefix")
-    count = obs.obs_data_get_int(settings, "count")
-    update_text_source()
+    local new_source_name = obs.obs_data_get_string(settings, "text_source")
+    if new_source_name ~= source_name then
+        source_name = new_source_name
+        update_text_source()
+    end
+
+    local new_prefix = obs.obs_data_get_string(settings, "prefix")
+    if new_prefix ~= prefix then
+        prefix = new_prefix
+        update_text_source()
+    end
+
+    local new_count = obs.obs_data_get_int(settings, "count")
+    if new_count ~= count then
+        count = new_count
+        update_text_source()
+    end
 end
 
 function update_text_source()
@@ -58,12 +74,15 @@ function update_text_source()
         obs.obs_source_update(source, settings)
         obs.obs_data_release(settings)
         obs.obs_source_release(source)
+    else
+        print("Failed to get source by name: " .. source_name)
     end
 end
 
 function increment_death_counter(pressed)
     if pressed then
         count = count + 1
+        print("Incrementing count: " .. count)
         update_text_source()
         save_counter_value()
     end
@@ -72,6 +91,7 @@ end
 function decrement_death_counter(pressed)
     if pressed then
         count = count - 1
+        print("Decrementing count: " .. count)
         update_text_source()
         save_counter_value()
     end
@@ -84,7 +104,7 @@ function save_counter_value()
 end
 
 function script_load(settings)
-    source_name = obs.obs_data_get_string(settings, "source_name")
+    source_name = obs.obs_data_get_string(settings, "text_source")
     prefix = obs.obs_data_get_string(settings, "prefix")
     count = obs.obs_data_get_int(settings, "count")
     update_text_source()
@@ -102,7 +122,7 @@ function script_load(settings)
 end
 
 function script_save(settings)
-    obs.obs_data_set_string(settings, "source_name", source_name)
+    obs.obs_data_set_string(settings, "text_source", source_name)
     obs.obs_data_set_string(settings, "prefix", prefix)
     obs.obs_data_set_int(settings, "count", count)
 
