@@ -72,4 +72,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any issues or questions, please open an issue on the GitLab repository or contact me on Telegram. Click >> <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_2019_Logo.svg" alt="t.me/shprd95" width="24" height="24" />.
+For any issues or questions, please open an issue on the GitLab repository or contact me on Telegram. Click >> ![Icon from FlatIcons](https://www.flaticon.com/premium-icon/icons/svg/Telegram_Logo.png).

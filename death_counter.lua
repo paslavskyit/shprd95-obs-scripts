@@ -36,8 +36,6 @@ function populate_text_sources(combo)
             obs.obs_property_list_add_string(combo, source_name, source_name)
         end
     end
-
-    -- No explicit release needed here as it's not a valid function
 end
 
 function script_defaults(settings)
