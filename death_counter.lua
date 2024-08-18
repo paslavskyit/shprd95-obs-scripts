@@ -12,43 +12,35 @@ end
 
 function script_properties()
     local props = obs.obs_properties_create()
+    local text_sources = obs.obs_properties_add_list(props, "text_source", "Text Source", obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
+    populate_text_sources(text_sources)
 
-    -- Dropdown for source name
-    local source_list = obs.obs_properties_add_list(props, "source_name", "Text Source", obs.OBS_COMBO_TYPE_EDITABLE, obs.OBS_COMBO_FORMAT_STRING)
-    populate_source_list(source_list)
-
-    -- Input for prefix text
     obs.obs_properties_add_text(props, "prefix", "Prefix Text", obs.OBS_TEXT_DEFAULT)
-
-    -- Input for death count
     obs.obs_properties_add_int(props, "count", "Death Count", 0, 1000000, 1)
-    
+
     return props
 end
 
-function populate_source_list(source_list)
-    -- Clear existing items
-    obs.obs_property_list_clear(source_list)
+function populate_text_sources(combo)
+    local sources = obs.obs_enum_sources()
 
-    -- Get all sources from the current scene collection
-    local scenes = obs.obs_frontend_get_scene_collections()
-    for _, scene_name in ipairs(scenes) do
-        local scene = obs.obs_get_source_by_name(scene_name)
-        if scene then
-            local sources = obs.obs_source_enum_sources(scene)
-            for _, source in ipairs(sources) do
-                if obs.obs_source_get_type(source) == obs.OBS_SOURCE_TYPE_INPUT then
-                    local source_type = obs.obs_source_get_type(source)
-                    if source_type == obs.OBS_SOURCE_TYPE_TEXT then
-                        local name = obs.obs_source_get_name(source)
-                        obs.obs_property_list_add_string(source_list, name, name)
-                    end
-                end
-            end
-            obs.obs_source_list_release(sources)
-            obs.obs_source_release(scene)
+    if sources == nil then
+        print("Failed to enumerate sources")
+        return
+    end
+
+    for _, source in ipairs(sources) do
+        local source_name = obs.obs_source_get_name(source)
+        local source_id = obs.obs_source_get_id(source)
+
+        if string.match(source_id, "^text_gdiplus") then
+            obs.obs_property_list_add_string(combo, source_name, source_name)
         end
     end
+end
+
+function script_defaults(settings)
+    obs.obs_data_set_default_string(settings, "text_source", "")
 end
 
 function script_update(settings)
@@ -97,8 +89,8 @@ function script_load(settings)
     count = obs.obs_data_get_int(settings, "count")
     update_text_source()
 
-    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment Death Counter", increment_death_counter)
-    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement Death Counter", decrement_death_counter)
+    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment SHPRD95's Counter", increment_death_counter)
+    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement SHPRD95's Counter", decrement_death_counter)
 
     local hotkey_save_array = obs.obs_data_get_array(settings, "increment_hotkey_id")
     obs.obs_hotkey_load(increment_hotkey_id, hotkey_save_array)
