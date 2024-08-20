@@ -1,75 +1,35 @@
-# SHPRD95's OBS Counter Script
+# SHPRD95's OBS Countdown Timer Script
 
-This repository contains a Lua script for OBS Studio to manage a death/kill(any) counter with a text source. The script allows you to increment and decrement the counter using hotkeys and automatically updates the selected source with the current counter value. 
+This OBS Lua script allows you to display a countdown timer on a text source in OBS Studio. The timer is based on the last number found in the text of the selected source. It includes features to start, pause/resume, and stop the timer, with options to automatically hide the source after the countdown ends.
 
 ## Features
 
-- Increment and decrement the counter with hotkeys.
-- The text source displays "Deaths: X", where X is the current counter value. You can add any prefix, for example "Kills".
-- The counter value is persistant and doesen't require any external file to store the information.
-- Source, prefix text, and counter updates automatically upon selection change.
+- **Read and Start Timer**: Extracts the last number from the selected text source and starts a countdown timer based on that value.
+- **Pause/Resume Timer**: Toggle between pausing and resuming the timer.
+- **Stop Timer**: Stops the timer and updates the text to a final message.
+- **Automatic Source Hiding**: Automatically hides the text source 10 seconds after the countdown finishes.
 
-**Note:** This version of the script automatically updates changes when you select a new source or modify the counter or prefix.
+## Installation
 
-## Prerequisites
+1. Open OBS Studio.
+2. Go to `Tools` > `Scripts`.
+3. Click the `+` button to add a new script.
+4. Browse to the location of the `countdown_timer.lua` file and select it.
 
-- **OBS Studio**: Ensure OBS Studio is installed on your system.
-- **OBS Lua Scripting**: OBS must support Lua scripting, typically included by default.
+## Configuration
 
-## Setup Instructions
+1. **Text Source**: Select the text source from which the script will read the countdown value.
+2. **Start Timer**: Click the "Start Timer" button to begin the countdown or trigger it with streamer bot.
+3. **Pause/Resume Timer**: Click the "Pause/Resume Timer" button to toggle the timer's state.
+4. **Stop Timer**: Click the "Stop Timer" button to stop the timer and update the text to the final message.
 
-### 1. Download the Script
+## Script Description
 
-1. Download the `death_counter.lua` script from this repository.
+The script reads the text from the selected source, extracting the last number to determine the countdown duration. The countdown is displayed on the screen, preserving the original text except for the updated timer portion. Includes buttons for manual control of the timer.
 
-### 2. Place the Script somewhere in your PC to be albe to add it to OBS
+## Example Usage
 
-1. **Open OBS Studio**.
-2. Go to **Tools** > **Scripts**.
-3. Click **Open Scripts Folder**.
-4. Find the path `death_counter.lua` to the file where you've placed it.
-
-### 3. Set Up the Text Source
-
-1. In OBS, add a new **Text (GDI+)** source to your scene.
-2. Adjust the font, color and size as needed.
-3. The source will automatically update with the counter value when selected.
-
-### 4. Configure the Script in OBS
-
-1. **Open OBS Studio**.
-2. Go to **Tools** > **Scripts**.
-3. Click **+** to add a new script.
-4. Select `death_counter.lua` from the Scripts folder.
-5. Set up the source selection, prefix, and file path in the script properties.
-
-### 5. Configure Hotkeys
-
-1. In OBS, go to **File** > **Settings** > **Hotkeys**.
-2. Scroll down to find the hotkeys for "Increment SHPRD95's Counter" and "Decrement SHPRD95's Counter".
-3. Assign desired key combinations for these actions.
-
-### 6. Script Configuration
-
-1. The script automatically detects text sources and lets you pick from available **Text (GDI+)** sources.
-2. You can specify a custom prefix (e.g., "Deaths: ").
-3. Changes are applied automatically when you pick a new source, modify the counter, or change the prefix.
-
-### 7. Test the Script
-
-1. **Increment/Decrement**: Use the assigned hotkeys to test the increment and decrement functionality.
-2. **Check Display**: Verify that the text source updates correctly to show "your_prefix: X" where X is the counter value.
-3. **Persistence**: Close and restart OBS to ensure the counter value persists correctly.
-
-## Troubleshooting
-
-- **Text Source Not Updating**: Ensure the text source name in the script matches the name in OBS. Check for any typos.
-- **Script Errors**: Review the OBS log for any script errors and ensure the Lua script is correctly formatted.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-## Contact
-
-For any issues or questions, please open an issue on the GitLab repository or contact me on Telegram. Click >> ![Icon from FlatIcons](https://www.flaticon.com/premium-icon/icons/svg/Telegram_Logo.png).
+1. **Configure Text Source**: Ensure the selected text source ends with the countdown value (e.g., "Remaining Time: 15").
+2. **Start Timer**: Click the "Start Timer" button to initialize the countdown or trigger it with streamer bot.
+3. **Pause/Resume Timer**: Use the "Pause/Resume Timer" button to pause or resume the countdown as needed.
+4. **Stop Timer**: Click the "Stop Timer" button to end the countdown and display the final message.
