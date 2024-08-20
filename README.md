@@ -1,4 +1,4 @@
-# SHPRD95's OBS Counter Script
+# SHPRD95's OBS Death Counter Script
 
 This repository contains a Lua script for OBS Studio to manage a death/kill(any) counter with a text source. The script allows you to increment and decrement the counter using hotkeys and automatically updates the selected source with the current counter value. 
 
