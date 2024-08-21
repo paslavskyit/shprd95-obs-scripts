@@ -5,7 +5,7 @@ local countdown = 0
 local original_text = ""
 local timer_running = false
 local timer_paused = false
-local hide_source_timer = nil
+local finish_text = "Вимога виконана, Shepherd завжди дотримується слова"  -- Default finish text
 
 -- Function to populate the dropdown with text sources
 function populate_text_sources(combo)
@@ -43,21 +43,13 @@ end
 function set_timer_based_on_text()
     local text = get_text_from_source()
     if text then
-        -- Log the full text for debugging
         obs.script_log(obs.LOG_INFO, "Text from source: " .. text)
 
-        -- Extract the last number from the text
         local timer_value = text:match("(%d+)%s*$")
 
-        -- Debug output for extracted timer value
         if timer_value then
             obs.script_log(obs.LOG_INFO, "Extracted timer value: " .. timer_value)
-        else
-            obs.script_log(obs.LOG_WARNING, "No valid timer value found in text.")
-        end
 
-        if timer_value then
-            -- Reset and stop any existing timer before starting a new one
             if timer_running then
                 obs.timer_remove(timer_callback)
                 timer_running = false
@@ -67,7 +59,6 @@ function set_timer_based_on_text()
             original_text = text:match("^(.-)%s*%d+%s*$") or text
             obs.script_log(obs.LOG_INFO, "Timer started for " .. countdown / 60 .. " minutes.")
             
-            -- Start the new timer
             obs.timer_add(timer_callback, 1000)  -- Update every second
             timer_running = true
         end
@@ -80,11 +71,12 @@ end
 function update_text_source()
     local source = obs.obs_get_source_by_name(source_name)
     if source then
+        obs.obs_source_set_enabled(source, true)  -- Ensure source is enabled
+
         local minutes = math.floor(countdown / 60)
         local seconds = countdown % 60
         local timer_text = string.format("%02d:%02d", minutes, seconds)
         
-        -- Preserve the original text and update only the timer part
         local full_text = original_text .. " " .. timer_text
 
         local settings = obs.obs_data_create()
@@ -107,28 +99,15 @@ function timer_callback()
         obs.timer_remove(timer_callback)
         timer_running = false
 
-        -- Set text to "Вимога виконана, Shepherd завжди дотримується слова"
+        -- Set final text without hiding the source
         local source = obs.obs_get_source_by_name(source_name)
         if source then
             local settings = obs.obs_data_create()
-            obs.obs_data_set_string(settings, "text", "Вимога виконана, Shepherd завжди дотримується слова")
+            obs.obs_data_set_string(settings, "text", finish_text)
             obs.obs_source_update(source, settings)
             obs.obs_data_release(settings)
             obs.obs_source_release(source)
         end
-
-        -- Schedule hiding the source after 10 seconds
-        if hide_source_timer then
-            obs.timer_remove(hide_source_timer)
-        end
-        hide_source_timer = obs.timer_add(function()
-            local source = obs.obs_get_source_by_name(source_name)
-            if source then
-                obs.obs_source_set_enabled(source, false)  -- Hide the source
-                obs.obs_source_release(source)
-            end
-            hide_source_timer = nil
-        end, 10000)  -- 10 seconds delay
     end
 end
 
@@ -136,11 +115,9 @@ end
 function toggle_pause_timer()
     if timer_running then
         if timer_paused then
-            -- Resume the timer
             timer_paused = false
             obs.script_log(obs.LOG_INFO, "Timer resumed.")
         else
-            -- Pause the timer
             timer_paused = true
             obs.script_log(obs.LOG_INFO, "Timer paused.")
         end
@@ -152,6 +129,11 @@ end
 -- Function to start the timer manually
 function start_timer()
     if not timer_running then
+        local source = obs.obs_get_source_by_name(source_name)
+        if source then
+            obs.obs_source_set_enabled(source, true)  -- Re-enable source before starting
+            obs.obs_source_release(source)
+        end
         set_timer_based_on_text()
     else
         obs.script_log(obs.LOG_WARNING, "Timer is already running.")
@@ -167,9 +149,10 @@ function stop_timer()
     local source = obs.obs_get_source_by_name(source_name)
     if source then
         local settings = obs.obs_data_create()
-        obs.obs_data_set_string(settings, "text", "Вимога виконана, Shepherd завжди дотримується слова")
+        obs.obs_data_set_string(settings, "text", finish_text)
         obs.obs_source_update(source, settings)
         obs.obs_data_release(settings)
+
         obs.obs_source_release(source)
     end
 
@@ -188,6 +171,7 @@ function script_properties()
     local text_sources = obs.obs_properties_add_list(props, "text_source", "Text Source", obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
     populate_text_sources(text_sources)
 
+    obs.obs_properties_add_text(props, "finish_text", "Finish Text", obs.OBS_TEXT_DEFAULT)  -- Use obs_properties_add_text for custom text
     obs.obs_properties_add_button(props, "start_button", "Start Timer", start_timer)
     obs.obs_properties_add_button(props, "pause_button", "Pause/Resume Timer", toggle_pause_timer)
     obs.obs_properties_add_button(props, "stop_button", "Stop Timer", stop_timer)
@@ -198,9 +182,11 @@ end
 -- Script update function
 function script_update(settings)
     source_name = obs.obs_data_get_string(settings, "text_source")
+    finish_text = obs.obs_data_get_string(settings, "finish_text")  -- Get the custom finish text
 end
 
 -- Script load function
 function script_load(settings)
     source_name = obs.obs_data_get_string(settings, "text_source")
+    finish_text = obs.obs_data_get_string(settings, "finish_text")  -- Get the custom finish text
 end
