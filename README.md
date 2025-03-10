@@ -1,43 +1,82 @@
-# SHPRD95's OBS Scripts Repository
+# SHPRD95's OBS Lua Scripts Collection
 
-This repository contains SHPRD95's OBS Lua scripts for managing text sources and timers ror OBS. The scripts are organized into separate branches for ease of use and maintenance.
+This repository contains a collection of Lua scripts for OBS Studio to enhance your streaming experience with timers, counters, and other useful tools.
 
-## Available Scripts and Branches
+## Available Scripts
 
-### 1. Death Counter Script
-- **Branch**: `death_counter`
-- **Description**: This script manages a death counter displayed on a text source in OBS Studio. It allows incrementing and decrementing the count and saving it persistently.
+### 1. Demo Timer (demo_timer.lua)
+- **Description**: A customizable countdown timer with UI controls and visual display
+- **Features**:
+   - Set custom duration (1-180 minutes)
+   - Start, pause, stop, and reset timer
+   - Quick time adjustments (+/- 5 minutes)
+   - Custom prefix and completion text
+   - Automatic formatting of time display (HH:MM:SS or MM:SS)
+   - Visibility control of timer source
 - **Usage**:
-  1. Switch to the `death_counter` branch: 
-     ```sh
-     git checkout death_counter
-     ```
-  2. Follow the instructions provided in the branch's README or the script's documentation.
+   1. Add the script in OBS: Scripts → + → Select demo_timer.lua
+   2. Select a text source from the dropdown
+   3. Configure timer settings and text options
+   4. Use the UI buttons to control the timer
 
-### 2. Countdown Timer Script
-- **Branch**: `countdown_timer`
-- **Description**: This script displays a countdown timer based on a number extracted from a text source in OBS Studio. It includes features to start, pause, resume, and stop the timer.
+### 2. Countdown Timer (countdown_timer.lua)
+- **Description**: Timer that reads numbers from a text source and counts down from that value
+- **Features**:
+   - Automatically extracts the timer value from text content
+   - Preserves the original text while updating only the time display
+   - Shows customizable completion message when timer finishes
+   - Start, pause, and stop controls
 - **Usage**:
-  1. Switch to the `countdown_timer` branch:
-     ```sh
-     git checkout countdown_timer
-     ```
-  2. Follow the instructions provided in the branch's README or the script's documentation.
+   1. Add the script in OBS: Scripts → + → Select countdown_timer.lua
+   2. Select a text source that contains a number (e.g., "Challenge: 30")
+   3. Use the buttons to start, pause, or stop the countdown
+   4. The timer will extract "30" and count down from there
 
-## How to Use
+### 3. Death Counter (death_counter.lua)
+- **Description**: Tracks death counts or other incremental values during gameplay
+- **Features**:
+   - Increment/decrement counter via hotkeys
+   - Persistent count between OBS sessions
+   - Customizable display text prefix
+   - Easy reset and adjustment
+- **Usage**:
+   1. Add the script in OBS: Scripts → + → Select death_counter.lua
+   2. Select a text source for displaying the count
+   3. Set a prefix text (e.g., "Deaths: ")
+   4. Configure hotkeys in OBS settings to increment/decrement the counter
 
-1. **Checkout a Branch**:
-   To access a specific script, switch to the corresponding branch using the `git checkout` command. For example:
-   ```sh
-   git checkout death_counter_script
-2. **Install the Script**:
-    Follow the instructions provided in the README file of the branch you are interested in to install and configure the script in OBS Studio.
+## Installation
 
-3. **Contribute**:
-If you wish to contribute or suggest improvements, please create a pull request with your changes.
+1. **Download Scripts**:
+    - Clone this repository or download individual .lua files
+
+2. **Add to OBS**:
+    - Open OBS Studio
+    - Go to Tools → Scripts
+    - Click the + button and navigate to the downloaded .lua file
+    - Select the script to add it
+
+3. **Configure Settings**:
+    - Select a text source for the script to use
+    - Adjust other settings as needed
+    - Set up hotkeys if applicable (in OBS Settings → Hotkeys)
+
+## Requirements
+
+- OBS Studio (version 27.0 or later recommended)
+- Text sources (GDI+ or FreeType 2) created in your OBS scenes
+
+## Troubleshooting
+
+- If a timer or counter is not updating, check that the correct text source is selected
+- Ensure the text source exists and is properly named in your scene
+- Check OBS Script Log for error messages (Tools → Scripts → Script Log)
+- Verify that the text format matches what the script expects to parse
 
 ## Contact
+
 For issues, feature requests, or contributions, please contact **SHPRD95** at [t.me/shprd95].
 
 ## License
-This repository is provided as-is. Feel free to use and modify the scripts as needed. No warranty is provided regarding their functionality or suitability for any particular purpose.
+
+These scripts are provided as-is. Feel free to use and modify them as needed for your streaming setup. No warranty is provided regarding their functionality or suitability for any particular purpose.
