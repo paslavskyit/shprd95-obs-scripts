@@ -1,82 +1,93 @@
-# SHPRD95's OBS Lua Scripts Collection
+# SHPRD95's OBS Demo Timer Script
 
-This repository contains a collection of Lua scripts for OBS Studio to enhance your streaming experience with timers, counters, and other useful tools.
+This OBS Lua script provides a fully-featured countdown timer with a clean user interface, customizable display settings, and multiple control options. The timer displays the remaining time on a text source in OBS Studio with various formatting options and controls to start, pause, stop, reset, and adjust the timer value.
 
-## Available Scripts
+## Features
 
-### 1. Demo Timer (demo_timer.lua)
-- **Description**: A customizable countdown timer with UI controls and visual display
-- **Features**:
-   - Set custom duration (1-180 minutes)
-   - Start, pause, stop, and reset timer
-   - Quick time adjustments (+/- 5 minutes)
-   - Custom prefix and completion text
-   - Automatic formatting of time display (HH:MM:SS or MM:SS)
-   - Visibility control of timer source
-- **Usage**:
-   1. Add the script in OBS: Scripts → + → Select demo_timer.lua
-   2. Select a text source from the dropdown
-   3. Configure timer settings and text options
-   4. Use the UI buttons to control the timer
-
-### 2. Countdown Timer (countdown_timer.lua)
-- **Description**: Timer that reads numbers from a text source and counts down from that value
-- **Features**:
-   - Automatically extracts the timer value from text content
-   - Preserves the original text while updating only the time display
-   - Shows customizable completion message when timer finishes
-   - Start, pause, and stop controls
-- **Usage**:
-   1. Add the script in OBS: Scripts → + → Select countdown_timer.lua
-   2. Select a text source that contains a number (e.g., "Challenge: 30")
-   3. Use the buttons to start, pause, or stop the countdown
-   4. The timer will extract "30" and count down from there
-
-### 3. Death Counter (death_counter.lua)
-- **Description**: Tracks death counts or other incremental values during gameplay
-- **Features**:
-   - Increment/decrement counter via hotkeys
-   - Persistent count between OBS sessions
-   - Customizable display text prefix
-   - Easy reset and adjustment
-- **Usage**:
-   1. Add the script in OBS: Scripts → + → Select death_counter.lua
-   2. Select a text source for displaying the count
-   3. Set a prefix text (e.g., "Deaths: ")
-   4. Configure hotkeys in OBS settings to increment/decrement the counter
+- **Customizable Timer Duration**: Set a timer from 1 to 180 minutes.
+- **Multiple Control Options**: Start, pause/resume, stop, and reset the timer with simple button clicks.
+- **Time Adjustments**: Quickly add or subtract 5 minutes from the current timer value.
+- **Smart Time Formatting**: Automatically displays time in MM:SS format, switching to HH:MM:SS for durations over 60 minutes.
+- **Custom Text Options**: Set prefix text and finish text to personalize the timer display.
+- **Source Visibility Control**: Timer automatically shows and hides the source when appropriate.
+- **Persistent Settings**: All configuration options are saved between OBS sessions.
 
 ## Installation
 
-1. **Download Scripts**:
-    - Clone this repository or download individual .lua files
+1. Download the `demo_timer.lua` script from this repository.
+2. Open OBS Studio.
+3. Go to **Tools** > **Scripts**.
+4. Click the **+** button to add a new script.
+5. Navigate to and select the `demo_timer.lua` file.
 
-2. **Add to OBS**:
-    - Open OBS Studio
-    - Go to Tools → Scripts
-    - Click the + button and navigate to the downloaded .lua file
-    - Select the script to add it
+## Configuration
 
-3. **Configure Settings**:
-    - Select a text source for the script to use
-    - Adjust other settings as needed
-    - Set up hotkeys if applicable (in OBS Settings → Hotkeys)
+### Basic Settings
 
-## Requirements
+1. **Text Source**: Select the text source that will display the timer. The script automatically detects all text sources in your scenes.
+2. **Timer Duration**: Set the initial duration for the timer in minutes (1-180).
+3. **Prefix Text**: Enter the text to display before the timer (e.g., "Time remaining:").
+4. **Finish Text**: Enter the text to display when the timer reaches zero (e.g., "Time's up!").
 
-- OBS Studio (version 27.0 or later recommended)
-- Text sources (GDI+ or FreeType 2) created in your OBS scenes
+### Control Buttons
+
+The script provides several control buttons directly in the script properties panel:
+
+- **Start Timer**: Begins the countdown from the set duration.
+- **Pause/Resume Timer**: Toggles the timer between paused and running states.
+- **Stop Timer**: Stops the timer and hides the source.
+- **Reset Timer**: Resets the timer to the initial duration.
+
+### Time Adjustments
+
+In the **Quick Adjustments** section:
+
+- **Add 5 Minutes**: Adds 5 minutes to the current timer value.
+- **Subtract 5 Minutes**: Subtracts 5 minutes from the current timer value (won't go below zero).
+
+## Usage Instructions
+
+### Setting Up the Timer
+
+1. Create a **Text (GDI+)** or **Text (FreeType 2)** source in your OBS scene.
+2. In the script settings, select this source from the dropdown menu.
+3. Set your desired timer duration, prefix text, and finish text.
+
+### Controlling the Timer
+
+1. **Start the Timer**:
+   - Click the "Start Timer" button in the script properties.
+   - The timer will begin counting down, and the source will become visible.
+
+2. **Pause/Resume the Timer**:
+   - Click the "Pause/Resume Timer" button to temporarily halt the countdown.
+   - Click again to resume from the paused time.
+
+3. **Stop the Timer**:
+   - Click the "Stop Timer" button to end the countdown.
+   - The timer source will be hidden.
+
+4. **Reset the Timer**:
+   - Click the "Reset Timer" button to return to the initial duration.
+   - This will not start the timer automatically.
+
+5. **Adjust the Timer**:
+   - Use the "Add 5 Minutes" or "Subtract 5 Minutes" buttons to quickly modify the timer value.
+   - If the timer is not running when adjusted, it will start automatically.
+
+### Timer Display
+
+- The timer displays in **MM:SS** format for durations under 60 minutes.
+- For durations over 60 minutes, it switches to **HH:MM:SS** format.
+- When the timer reaches zero, it displays the custom finish text.
 
 ## Troubleshooting
 
-- If a timer or counter is not updating, check that the correct text source is selected
-- Ensure the text source exists and is properly named in your scene
-- Check OBS Script Log for error messages (Tools → Scripts → Script Log)
-- Verify that the text format matches what the script expects to parse
-
-## Contact
-
-For issues, feature requests, or contributions, please contact **SHPRD95** at [t.me/shprd95].
+- **Timer Not Appearing**: Ensure the selected text source exists in your current scene.
+- **Timer Not Starting**: Check that the source is properly selected in the script settings.
+- **Incorrect Formatting**: If the timer display looks incorrect, try resetting the timer or adjusting the prefix text.
+- **Script Errors**: Review the OBS Script Log (Tools → Scripts → Script Log) for any error messages.
 
 ## License
 
-These scripts are provided as-is. Feel free to use and modify them as needed for your streaming setup. No warranty is provided regarding their functionality or suitability for any particular purpose.
+This script is provided as-is. Feel free to use and modify it as needed for your streaming setup. No warranty is provided regarding its functionality or suitability for any particular purpose.
