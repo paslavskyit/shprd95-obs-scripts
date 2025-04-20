@@ -3,12 +3,13 @@ obs = obslua
 -- Settings
 local source_name = "Timer_demo_source"
 local countdown = 15 * 60 -- Default 15 minutes in seconds
+local duration_minutes = 15 -- Store the duration setting separately
 local original_text = "Time remaining: "
 local timer_running = false
 local timer_paused = false
 local finish_text = "Time's up!"
 local interval = 1000 -- Update interval in milliseconds
-local version = "1.3.0" -- Version tracking
+local version = "1.3.3" -- Version tracking
 
 -- Function to populate the dropdown with text sources
 function populate_text_sources(combo)
@@ -31,6 +32,56 @@ function populate_text_sources(combo)
     end
     obs.source_list_release(sources)
     obs.script_log(obs.LOG_INFO, string.format("Found %d text sources", count))
+end
+
+-- Function to get the current text from the source
+function get_text_from_source()
+    local source = get_source_safe(source_name)
+    if source then
+        local settings = obs.obs_source_get_settings(source)
+        local text = obs.obs_data_get_string(settings, "text")
+        obs.obs_data_release(settings)
+        obs.obs_source_release(source)
+        return text
+    end
+    return nil
+end
+
+-- Check if text ends with a time format (MM:SS or HH:MM:SS)
+function has_time_format_at_end(text)
+    if not text then return false end
+    
+    -- Check for MM:SS format at the end
+    if text:match("%d%d:%d%d%s*$") then
+        return true
+    end
+    
+    -- Check for HH:MM:SS format at the end
+    if text:match("%d%d:%d%d:%d%d%s*$") then
+        return true
+    end
+    
+    return false
+end
+
+-- Extract prefix text (everything before the time format)
+function extract_prefix_from_text(text)
+    if not text then return original_text end
+    
+    -- Try to extract prefix before MM:SS format
+    local prefix = text:match("^(.-)%s*%d%d:%d%d%s*$")
+    
+    -- Try to extract prefix before HH:MM:SS format
+    if not prefix then
+        prefix = text:match("^(.-)%s*%d%d:%d%d:%d%d%s*$")
+    end
+    
+    if prefix then
+        obs.script_log(obs.LOG_INFO, "Extracted prefix: '" .. prefix .. "'")
+        return prefix
+    end
+    
+    return text
 end
 
 -- Format time as MM:SS with optional hour display for times > 60 minutes
@@ -66,7 +117,23 @@ function update_text_source()
     local source = get_source_safe(source_name)
     if source then
         local timer_text = format_time(countdown)
-        local full_text = original_text .. " " .. timer_text
+        local full_text
+        
+        -- Check if there's existing text in the source
+        local current_text = get_text_from_source()
+        
+        if current_text and has_time_format_at_end(current_text) then
+            -- If text already ends with a time format, replace it
+            full_text = extract_prefix_from_text(current_text) .. " " .. timer_text
+            obs.script_log(obs.LOG_DEBUG, "Replacing existing time format in: " .. current_text)
+        elseif current_text and current_text ~= "" then
+            -- Use existing text as prefix
+            full_text = current_text .. " " .. timer_text
+            obs.script_log(obs.LOG_DEBUG, "Appending time to existing text: " .. current_text)
+        else
+            -- Use default prefix
+            full_text = original_text .. " " .. timer_text
+        end
 
         local settings = obs.obs_data_create()
         obs.obs_data_set_string(settings, "text", full_text)
@@ -134,10 +201,30 @@ function start_timer()
             obs.script_log(obs.LOG_INFO, "Enabling source visibility")
             obs.obs_source_set_enabled(source, true)
         end
+        
+        -- Get the current text to use as prefix
+        local current_text = get_text_from_source()
+        if current_text and current_text ~= "" then
+            -- If text already has a time format at the end, extract just the prefix
+            if has_time_format_at_end(current_text) then
+                original_text = extract_prefix_from_text(current_text)
+                obs.script_log(obs.LOG_INFO, "Extracted prefix from existing text: " .. original_text)
+            else
+                original_text = current_text
+                obs.script_log(obs.LOG_INFO, "Using existing text as prefix: " .. original_text)
+            end
+        end
+        
         obs.obs_source_release(source)
     else
         obs.script_log(obs.LOG_WARNING, "Failed to get source for timer start")
         return false
+    end
+    
+    -- Use the duration from settings when starting a new timer
+    if not timer_running then
+        countdown = duration_minutes * 60
+        obs.script_log(obs.LOG_INFO, "Setting timer to duration from settings: " .. duration_minutes .. " minutes")
     end
     
     timer_running = true
@@ -205,12 +292,12 @@ function reset_timer()
         timer_running = false
     end
     
-    -- Reset to default 15 minutes
-    countdown = 15 * 60
+    -- Reset to the duration from settings (not hardcoded 15 minutes)
+    countdown = duration_minutes * 60
     timer_paused = false
     
     update_text_source()
-    obs.script_log(obs.LOG_INFO, "Timer reset to 15:00")
+    obs.script_log(obs.LOG_INFO, "Timer reset to " .. format_time(countdown))
     
     return true
 end
@@ -248,7 +335,7 @@ end
 
 -- Script description
 function script_description()
-    return "Countdown Timer v" .. version .. " - Controls a countdown timer with UI buttons and hotkeys"
+    return "Countdown Timer v" .. version .. " - Controls a countdown timer with UI buttons and hotkeys. Preserves existing text in source."
 end
 
 -- Script properties
@@ -263,7 +350,7 @@ function script_properties()
     
     -- Timer settings
     obs.obs_properties_add_int(props, "duration", "Timer Duration (minutes)", 1, 180, 1)
-    obs.obs_properties_add_text(props, "prefix_text", "Prefix Text", obs.OBS_TEXT_DEFAULT)
+    obs.obs_properties_add_text(props, "prefix_text", "Default Prefix Text", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_text(props, "finish_text", "Finish Text", obs.OBS_TEXT_DEFAULT)
     
     -- Control buttons
@@ -286,30 +373,35 @@ function script_update(settings)
     local new_source = obs.obs_data_get_string(settings, "text_source")
     local new_prefix = obs.obs_data_get_string(settings, "prefix_text")
     local new_finish = obs.obs_data_get_string(settings, "finish_text")
+    local new_duration = obs.obs_data_get_int(settings, "duration")
     
     -- Log changes to settings
     if new_source ~= source_name then
         obs.script_log(obs.LOG_INFO, "Source changed from '" .. source_name .. "' to '" .. new_source .. "'")
     end
     
-    if new_prefix ~= original_text then
-        obs.script_log(obs.LOG_INFO, "Prefix text changed from '" .. original_text .. "' to '" .. new_prefix .. "'")
+    if new_prefix ~= original_text and not timer_running then
+        obs.script_log(obs.LOG_INFO, "Default prefix text changed from '" .. original_text .. "' to '" .. new_prefix .. "'")
+        original_text = new_prefix
     end
     
     if new_finish ~= finish_text then
         obs.script_log(obs.LOG_INFO, "Finish text changed from '" .. finish_text .. "' to '" .. new_finish .. "'")
     end
     
-    source_name = new_source
-    original_text = new_prefix
-    finish_text = new_finish
-    
-    -- Only update countdown if timer is not running
-    if not timer_running then
-        local new_duration = obs.obs_data_get_int(settings, "duration")
-        countdown = new_duration * 60
-        obs.script_log(obs.LOG_INFO, "Duration set to " .. new_duration .. " minutes")
+    if new_duration ~= duration_minutes then
+        obs.script_log(obs.LOG_INFO, "Duration changed from " .. duration_minutes .. " to " .. new_duration .. " minutes")
+        duration_minutes = new_duration
+        
+        -- Only update countdown if timer is not running
+        if not timer_running then
+            countdown = duration_minutes * 60
+            obs.script_log(obs.LOG_INFO, "Countdown set to " .. format_time(countdown))
+        end
     end
+    
+    source_name = new_source
+    finish_text = new_finish
 end
 
 -- Script save
@@ -317,7 +409,7 @@ function script_save(settings)
     obs.obs_data_set_string(settings, "text_source", source_name)
     obs.obs_data_set_string(settings, "prefix_text", original_text)
     obs.obs_data_set_string(settings, "finish_text", finish_text)
-    obs.obs_data_set_int(settings, "duration", math.floor(countdown / 60))
+    obs.obs_data_set_int(settings, "duration", duration_minutes)
     obs.script_log(obs.LOG_INFO, "Timer settings saved")
 end
 
@@ -336,10 +428,11 @@ function script_load(settings)
     source_name = obs.obs_data_get_string(settings, "text_source")
     original_text = obs.obs_data_get_string(settings, "prefix_text")
     finish_text = obs.obs_data_get_string(settings, "finish_text")
-    countdown = obs.obs_data_get_int(settings, "duration") * 60
+    duration_minutes = obs.obs_data_get_int(settings, "duration")
+    countdown = duration_minutes * 60
     
     obs.script_log(obs.LOG_INFO, string.format("Loaded with source: '%s', prefix: '%s', duration: %d minutes", 
-        source_name, original_text, countdown / 60))
+        source_name, original_text, duration_minutes))
     
     obs.script_log(obs.LOG_INFO, "Timer script successfully loaded")
 end
