@@ -5,11 +5,20 @@ local source_name = "Timer_demo_source"
 local countdown = 15 * 60 -- Default 15 minutes in seconds
 local duration_minutes = 15 -- Store the duration setting separately
 local original_text = "Time remaining: "
+local default_prefix_text = "Time remaining: " -- Store the default prefix from settings
 local timer_running = false
 local timer_paused = false
 local finish_text = "Time's up!"
 local interval = 1000 -- Update interval in milliseconds
-local version = "1.3.3" -- Version tracking
+local version = "1.4.0" -- Version tracking
+
+-- Hotkey IDs
+local hotkey_id_start = obs.OBS_INVALID_HOTKEY_ID
+local hotkey_id_pause = obs.OBS_INVALID_HOTKEY_ID
+local hotkey_id_stop = obs.OBS_INVALID_HOTKEY_ID
+local hotkey_id_reset = obs.OBS_INVALID_HOTKEY_ID
+local hotkey_id_add = obs.OBS_INVALID_HOTKEY_ID
+local hotkey_id_subtract = obs.OBS_INVALID_HOTKEY_ID
 
 -- Function to populate the dropdown with text sources
 function populate_text_sources(combo)
@@ -268,15 +277,20 @@ function stop_timer()
     timer_running = false
     timer_paused = false
     
+    -- Remove the timer callback
+    obs.timer_remove(timer_callback)
+    
+    -- Set the finish text
     local source = get_source_safe(source_name)
     if source then
-        -- Hide the source when stopped
-        obs.obs_source_set_enabled(source, false)
+        local settings = obs.obs_data_create()
+        obs.obs_data_set_string(settings, "text", finish_text)
+        obs.obs_source_update(source, settings)
+        obs.obs_data_release(settings)
         obs.obs_source_release(source)
-        obs.script_log(obs.LOG_INFO, "Source hidden")
+        obs.script_log(obs.LOG_INFO, "Set finish text: " .. finish_text)
     end
-
-    obs.timer_remove(timer_callback)
+    
     obs.script_log(obs.LOG_INFO, "Timer stopped with " .. countdown .. " seconds remaining")
     
     return true
@@ -292,11 +306,27 @@ function reset_timer()
         timer_running = false
     end
     
-    -- Reset to the duration from settings (not hardcoded 15 minutes)
+    -- Reset to the duration from settings
     countdown = duration_minutes * 60
     timer_paused = false
     
-    update_text_source()
+    -- Reset the prefix text to the default one from settings
+    original_text = default_prefix_text
+    
+    -- Update the source with the default prefix and reset time
+    local source = get_source_safe(source_name)
+    if source then
+        local full_text = original_text .. " " .. format_time(countdown)
+        
+        local settings = obs.obs_data_create()
+        obs.obs_data_set_string(settings, "text", full_text)
+        obs.obs_source_update(source, settings)
+        obs.obs_data_release(settings)
+        obs.obs_source_release(source)
+        
+        obs.script_log(obs.LOG_INFO, "Reset text to default prefix: '" .. original_text .. "' with time: " .. format_time(countdown))
+    end
+    
     obs.script_log(obs.LOG_INFO, "Timer reset to " .. format_time(countdown))
     
     return true
@@ -331,6 +361,49 @@ function adjust_timer(minutes)
     end
     
     return true
+end
+
+-- Hotkey callback functions
+function on_hotkey_start(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Start timer hotkey pressed")
+        start_timer()
+    end
+end
+
+function on_hotkey_pause(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Pause/Resume timer hotkey pressed")
+        toggle_pause_timer()
+    end
+end
+
+function on_hotkey_stop(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Stop timer hotkey pressed")
+        stop_timer()
+    end
+end
+
+function on_hotkey_reset(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Reset timer hotkey pressed")
+        reset_timer()
+    end
+end
+
+function on_hotkey_add(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Add 5 minutes hotkey pressed")
+        adjust_timer(5)
+    end
+end
+
+function on_hotkey_subtract(pressed)
+    if pressed then
+        obs.script_log(obs.LOG_INFO, "Subtract 5 minutes hotkey pressed")
+        adjust_timer(-5)
+    end
 end
 
 -- Script description
@@ -380,9 +453,14 @@ function script_update(settings)
         obs.script_log(obs.LOG_INFO, "Source changed from '" .. source_name .. "' to '" .. new_source .. "'")
     end
     
-    if new_prefix ~= original_text and not timer_running then
-        obs.script_log(obs.LOG_INFO, "Default prefix text changed from '" .. original_text .. "' to '" .. new_prefix .. "'")
-        original_text = new_prefix
+    if new_prefix ~= default_prefix_text then
+        obs.script_log(obs.LOG_INFO, "Default prefix text changed from '" .. default_prefix_text .. "' to '" .. new_prefix .. "'")
+        default_prefix_text = new_prefix
+        
+        -- Only update the current prefix if timer is not running
+        if not timer_running then
+            original_text = new_prefix
+        end
     end
     
     if new_finish ~= finish_text then
@@ -407,10 +485,16 @@ end
 -- Script save
 function script_save(settings)
     obs.obs_data_set_string(settings, "text_source", source_name)
-    obs.obs_data_set_string(settings, "prefix_text", original_text)
+    obs.obs_data_set_string(settings, "prefix_text", default_prefix_text)
     obs.obs_data_set_string(settings, "finish_text", finish_text)
     obs.obs_data_set_int(settings, "duration", duration_minutes)
-    obs.script_log(obs.LOG_INFO, "Timer settings saved")
+    
+    -- Save hotkey data
+    local hotkey_save_array = obs.obs_hotkey_save(hotkey_id_start)
+    obs.obs_data_set_array(settings, "timer_hotkeys", hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
+    
+    obs.script_log(obs.LOG_INFO, "Timer settings and hotkeys saved")
 end
 
 -- Script defaults
@@ -426,13 +510,45 @@ function script_load(settings)
     obs.script_log(obs.LOG_INFO, "Timer script v" .. version .. " loading")
     
     source_name = obs.obs_data_get_string(settings, "text_source")
-    original_text = obs.obs_data_get_string(settings, "prefix_text")
+    default_prefix_text = obs.obs_data_get_string(settings, "prefix_text")
+    original_text = default_prefix_text -- Initialize with default prefix
     finish_text = obs.obs_data_get_string(settings, "finish_text")
     duration_minutes = obs.obs_data_get_int(settings, "duration")
     countdown = duration_minutes * 60
     
+    -- Register hotkeys with SHPRD95 prefix
+    hotkey_id_start = obs.obs_hotkey_register_frontend("timer_start", "SHPRD95 Start Timer", on_hotkey_start)
+    hotkey_id_pause = obs.obs_hotkey_register_frontend("timer_pause", "SHPRD95 Pause/Continue Timer", on_hotkey_pause)
+    hotkey_id_stop = obs.obs_hotkey_register_frontend("timer_stop", "SHPRD95 Stop Timer", on_hotkey_stop)
+    hotkey_id_reset = obs.obs_hotkey_register_frontend("timer_reset", "SHPRD95 Reset Timer", on_hotkey_reset)
+    hotkey_id_add = obs.obs_hotkey_register_frontend("timer_add", "SHPRD95 Add 5 Minutes", on_hotkey_add)
+    hotkey_id_subtract = obs.obs_hotkey_register_frontend("timer_subtract", "SHPRD95 Subtract 5 Minutes", on_hotkey_subtract)
+    
+    -- Load saved hotkey data
+    local hotkey_save_array = obs.obs_data_get_array(settings, "timer_hotkeys")
+    obs.obs_hotkey_load(hotkey_id_start, hotkey_save_array)
+    obs.obs_hotkey_load(hotkey_id_pause, hotkey_save_array)
+    obs.obs_hotkey_load(hotkey_id_stop, hotkey_save_array)
+    obs.obs_hotkey_load(hotkey_id_reset, hotkey_save_array)
+    obs.obs_hotkey_load(hotkey_id_add, hotkey_save_array)
+    obs.obs_hotkey_load(hotkey_id_subtract, hotkey_save_array)
+    obs.obs_data_array_release(hotkey_save_array)
+    
     obs.script_log(obs.LOG_INFO, string.format("Loaded with source: '%s', prefix: '%s', duration: %d minutes", 
         source_name, original_text, duration_minutes))
     
-    obs.script_log(obs.LOG_INFO, "Timer script successfully loaded")
+    obs.script_log(obs.LOG_INFO, "Timer script successfully loaded with hotkeys")
+end
+
+-- Clean up on script unload
+function script_unload()
+    obs.script_log(obs.LOG_INFO, "Timer script unloading")
+    
+    -- Stop the timer if it's running
+    if timer_running then
+        obs.timer_remove(timer_callback)
+        timer_running = false
+    end
+    
+    obs.script_log(obs.LOG_INFO, "Timer script successfully unloaded")
 end
