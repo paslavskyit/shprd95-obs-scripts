@@ -488,12 +488,15 @@ function script_save(settings)
     obs.obs_data_set_string(settings, "prefix_text", default_prefix_text)
     obs.obs_data_set_string(settings, "finish_text", finish_text)
     obs.obs_data_set_int(settings, "duration", duration_minutes)
-    
-    -- Save hotkey data
-    local hotkey_save_array = obs.obs_hotkey_save(hotkey_id_start)
-    obs.obs_data_set_array(settings, "timer_hotkeys", hotkey_save_array)
-    obs.obs_data_array_release(hotkey_save_array)
-    
+
+    -- Save each hotkey separately
+    obs.obs_data_set_array(settings, "timer_hotkey_start", obs.obs_hotkey_save(hotkey_id_start))
+    obs.obs_data_set_array(settings, "timer_hotkey_pause", obs.obs_hotkey_save(hotkey_id_pause))
+    obs.obs_data_set_array(settings, "timer_hotkey_stop", obs.obs_hotkey_save(hotkey_id_stop))
+    obs.obs_data_set_array(settings, "timer_hotkey_reset", obs.obs_hotkey_save(hotkey_id_reset))
+    obs.obs_data_set_array(settings, "timer_hotkey_add", obs.obs_hotkey_save(hotkey_id_add))
+    obs.obs_data_set_array(settings, "timer_hotkey_subtract", obs.obs_hotkey_save(hotkey_id_subtract))
+
     obs.script_log(obs.LOG_INFO, "Timer settings and hotkeys saved")
 end
 
@@ -508,35 +511,40 @@ end
 -- Script load
 function script_load(settings)
     obs.script_log(obs.LOG_INFO, "Timer script v" .. version .. " loading")
-    
+
     source_name = obs.obs_data_get_string(settings, "text_source")
     default_prefix_text = obs.obs_data_get_string(settings, "prefix_text")
-    original_text = default_prefix_text -- Initialize with default prefix
+    original_text = default_prefix_text
     finish_text = obs.obs_data_get_string(settings, "finish_text")
     duration_minutes = obs.obs_data_get_int(settings, "duration")
     countdown = duration_minutes * 60
-    
-    -- Register hotkeys with SHPRD95 prefix
+
+    -- Register hotkeys
     hotkey_id_start = obs.obs_hotkey_register_frontend("timer_start", "SHPRD95 Start Timer", on_hotkey_start)
     hotkey_id_pause = obs.obs_hotkey_register_frontend("timer_pause", "SHPRD95 Pause/Continue Timer", on_hotkey_pause)
     hotkey_id_stop = obs.obs_hotkey_register_frontend("timer_stop", "SHPRD95 Stop Timer", on_hotkey_stop)
     hotkey_id_reset = obs.obs_hotkey_register_frontend("timer_reset", "SHPRD95 Reset Timer", on_hotkey_reset)
     hotkey_id_add = obs.obs_hotkey_register_frontend("timer_add", "SHPRD95 Add 5 Minutes", on_hotkey_add)
     hotkey_id_subtract = obs.obs_hotkey_register_frontend("timer_subtract", "SHPRD95 Subtract 5 Minutes", on_hotkey_subtract)
-    
-    -- Load saved hotkey data
-    local hotkey_save_array = obs.obs_data_get_array(settings, "timer_hotkeys")
-    obs.obs_hotkey_load(hotkey_id_start, hotkey_save_array)
-    obs.obs_hotkey_load(hotkey_id_pause, hotkey_save_array)
-    obs.obs_hotkey_load(hotkey_id_stop, hotkey_save_array)
-    obs.obs_hotkey_load(hotkey_id_reset, hotkey_save_array)
-    obs.obs_hotkey_load(hotkey_id_add, hotkey_save_array)
-    obs.obs_hotkey_load(hotkey_id_subtract, hotkey_save_array)
-    obs.obs_data_array_release(hotkey_save_array)
-    
-    obs.script_log(obs.LOG_INFO, string.format("Loaded with source: '%s', prefix: '%s', duration: %d minutes", 
+
+    -- Helper function to load each hotkey
+    local function load_hotkey(id, key)
+        local hotkey_array = obs.obs_data_get_array(settings, key)
+        obs.obs_hotkey_load(id, hotkey_array)
+        obs.obs_data_array_release(hotkey_array)
+    end
+
+    -- Load each hotkey separately
+    load_hotkey(hotkey_id_start, "timer_hotkey_start")
+    load_hotkey(hotkey_id_pause, "timer_hotkey_pause")
+    load_hotkey(hotkey_id_stop, "timer_hotkey_stop")
+    load_hotkey(hotkey_id_reset, "timer_hotkey_reset")
+    load_hotkey(hotkey_id_add, "timer_hotkey_add")
+    load_hotkey(hotkey_id_subtract, "timer_hotkey_subtract")
+
+    obs.script_log(obs.LOG_INFO, string.format("Loaded with source: '%s', prefix: '%s', duration: %d minutes",
         source_name, original_text, duration_minutes))
-    
+
     obs.script_log(obs.LOG_INFO, "Timer script successfully loaded with hotkeys")
 end
 
