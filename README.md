@@ -1,10 +1,10 @@
-# SHPRD95's OBS Lua Scripts Collection
+# TarasAVG OBS Lua Scripts Collection
 
 This repository contains a collection of Lua scripts for OBS Studio to enhance your streaming experience with timers, counters, and other useful tools.
 
 ## Available Scripts
 
-### 1. Demo Timer (demo_timer.lua)
+### 1. Demo Timer (tarasavg_demo_timer.lua)
 - **Description**: A customizable countdown timer with UI controls and visual display
 - **Features**:
    - Set custom duration (1-180 minutes)
@@ -19,7 +19,7 @@ This repository contains a collection of Lua scripts for OBS Studio to enhance y
    3. Configure timer settings and text options
    4. Use the UI buttons to control the timer
 
-### 2. Countdown Timer (countdown_timer.lua)
+### 2. Countdown Timer (countdown_timer.lua) Deprecated
 - **Description**: Timer that reads numbers from a text source and counts down from that value
 - **Features**:
    - Automatically extracts the timer value from text content
@@ -32,7 +32,7 @@ This repository contains a collection of Lua scripts for OBS Studio to enhance y
    3. Use the buttons to start, pause, or stop the countdown
    4. The timer will extract "30" and count down from there
 
-### 3. Death Counter (death_counter.lua)
+### 3. Death Counter (tarasavg_death_counter.lua)
 - **Description**: Tracks death counts or other incremental values during gameplay
 - **Features**:
    - Increment/decrement counter via hotkeys
@@ -73,10 +73,15 @@ This repository contains a collection of Lua scripts for OBS Studio to enhance y
 - Check OBS Script Log for error messages (Tools → Scripts → Script Log)
 - Verify that the text format matches what the script expects to parse
 
-## Contact
-
-For issues, feature requests, or contributions, please contact **SHPRD95** at [t.me/shprd95].
 
 ## License
 
 These scripts are provided as-is. Feel free to use and modify them as needed for your streaming setup. No warranty is provided regarding their functionality or suitability for any particular purpose.
+
+## Contact
+
+For any issues or questions, please open an issue on the GitLab repository or contact me on <a href="https://t.me/paslavskyit">Telegram</a>.
+
+<p align="center">
+  Like this script? <a href="https://www.twitch.tv/tarasavg">Follow my Twitch channel💜</a> or <a href="https://donatello.to/tarasavg">tip some money💸</a>!
+</p>
