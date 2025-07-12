@@ -112,8 +112,8 @@ function script_load(settings)
     count = obs.obs_data_get_int(settings, "count")
     update_text_source()
 
-    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment SHPRD95's Counter", increment_death_counter)
-    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement SHPRD95's Counter", decrement_death_counter)
+    increment_hotkey_id = obs.obs_hotkey_register_frontend("increment_death_counter", "Increment TarasAVG Counter", increment_death_counter)
+    decrement_hotkey_id = obs.obs_hotkey_register_frontend("decrement_death_counter", "Decrement TarasAVG Counter", decrement_death_counter)
 
     local hotkey_save_array = obs.obs_data_get_array(settings, "increment_hotkey_id")
     obs.obs_hotkey_load(increment_hotkey_id, hotkey_save_array)

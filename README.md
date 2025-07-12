@@ -1,4 +1,4 @@
-# SHPRD95's OBS Death Counter Script
+# TarasAVG OBS Death Counter Script
 
 This repository contains a Lua script for OBS Studio to manage a death/kill(any) counter with a text source. The script allows you to increment and decrement the counter using hotkeys and automatically updates the selected source with the current counter value. 
 
@@ -20,14 +20,14 @@ This repository contains a Lua script for OBS Studio to manage a death/kill(any)
 
 ### 1. Download the Script
 
-1. Download the `death_counter.lua` script from this repository.
+1. Download the `tarasavg_death_counter.lua` script from this repository.
 
 ### 2. Place the Script somewhere in your PC to be albe to add it to OBS
 
 1. **Open OBS Studio**.
 2. Go to **Tools** > **Scripts**.
 3. Click **Open Scripts Folder**.
-4. Find the path `death_counter.lua` to the file where you've placed it.
+4. Find the path `tarasavg_death_counter.lua` to the file where you've placed it.
 
 ### 3. Set Up the Text Source
 
@@ -40,13 +40,13 @@ This repository contains a Lua script for OBS Studio to manage a death/kill(any)
 1. **Open OBS Studio**.
 2. Go to **Tools** > **Scripts**.
 3. Click **+** to add a new script.
-4. Select `death_counter.lua` from the Scripts folder.
+4. Select `tarasavg_death_counter.lua` from the Scripts folder.
 5. Set up the source selection, prefix, and file path in the script properties.
 
 ### 5. Configure Hotkeys
 
 1. In OBS, go to **File** > **Settings** > **Hotkeys**.
-2. Scroll down to find the hotkeys for "Increment SHPRD95's Counter" and "Decrement SHPRD95's Counter".
+2. Scroll down to find the hotkeys for "Increment TarasAVG Counter" and "Decrement TarasAVG Counter".
 3. Assign desired key combinations for these actions.
 
 ### 6. Script Configuration
