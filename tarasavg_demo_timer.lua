@@ -524,12 +524,12 @@ function script_load(settings)
     countdown = duration_minutes * 60
 
     -- Register hotkeys
-    hotkey_id_start = obs.obs_hotkey_register_frontend("timer_start", "SHPRD95 Start Timer", on_hotkey_start)
-    hotkey_id_pause = obs.obs_hotkey_register_frontend("timer_pause", "SHPRD95 Pause/Continue Timer", on_hotkey_pause)
-    hotkey_id_stop = obs.obs_hotkey_register_frontend("timer_stop", "SHPRD95 Stop Timer", on_hotkey_stop)
-    hotkey_id_reset = obs.obs_hotkey_register_frontend("timer_reset", "SHPRD95 Reset Timer", on_hotkey_reset)
-    hotkey_id_add = obs.obs_hotkey_register_frontend("timer_add", "SHPRD95 Add 5 Minutes", on_hotkey_add)
-    hotkey_id_subtract = obs.obs_hotkey_register_frontend("timer_subtract", "SHPRD95 Subtract 5 Minutes", on_hotkey_subtract)
+    hotkey_id_start = obs.obs_hotkey_register_frontend("timer_start", "TarasAVG Start Timer", on_hotkey_start)
+    hotkey_id_pause = obs.obs_hotkey_register_frontend("timer_pause", "TarasAVG Pause/Continue Timer", on_hotkey_pause)
+    hotkey_id_stop = obs.obs_hotkey_register_frontend("timer_stop", "TarasAVG Stop Timer", on_hotkey_stop)
+    hotkey_id_reset = obs.obs_hotkey_register_frontend("timer_reset", "TarasAVG Reset Timer", on_hotkey_reset)
+    hotkey_id_add = obs.obs_hotkey_register_frontend("timer_add", "TarasAVG Add 5 Minutes", on_hotkey_add)
+    hotkey_id_subtract = obs.obs_hotkey_register_frontend("timer_subtract", "TarasAVG Subtract 5 Minutes", on_hotkey_subtract)
 
     -- Helper function to load each hotkey
     local function load_hotkey(id, key)
