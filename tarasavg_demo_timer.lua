@@ -437,6 +437,10 @@ function script_properties()
     obs.obs_properties_add_button(adjustment_group, "add_5min", "Add 5 Minutes", function() adjust_timer(5); return true end)
     obs.obs_properties_add_button(adjustment_group, "sub_5min", "Subtract 5 Minutes", function() adjust_timer(-5); return true end)
     obs.obs_properties_add_group(props, "adjustments", "Add manually", obs.OBS_GROUP_NORMAL, adjustment_group)
+
+    local support_text = obs.obs_properties_add_text(props, "support", "Support", obs.OBS_TEXT_INFO)
+    obs.obs_property_set_description(support_text, "Like this script? <a href='https://www.twitch.tv/tarasavg'>Follow my Twitch channel💜</a> or <a href='https://donatello.to/tarasavg'>tip some money💸</a>!")
+
     
     return props
 end

@@ -1,4 +1,4 @@
-# SHPRD95's OBS Demo Timer Script
+# TarasAVG OBS Demo Timer Script
 
 This OBS Lua script provides a fully-featured countdown timer with a clean user interface, customizable display settings, and multiple control options. The timer displays the remaining time on a text source in OBS Studio with various formatting options and controls to start, pause, stop, reset, and adjust the timer value.
 
@@ -14,11 +14,11 @@ This OBS Lua script provides a fully-featured countdown timer with a clean user 
 
 ## Installation
 
-1. Download the `demo_timer.lua` script from this repository.
+1. Download the `tarasavg_demo_timer.lua` script from this repository.
 2. Open OBS Studio.
 3. Go to **Tools** > **Scripts**.
 4. Click the **+** button to add a new script.
-5. Navigate to and select the `demo_timer.lua` file.
+5. Navigate to and select the `tarasavg_demo_timer.lua` file.
 
 ## Configuration
 
@@ -91,3 +91,11 @@ In the **Quick Adjustments** section:
 ## License
 
 This script is provided as-is. Feel free to use and modify it as needed for your streaming setup. No warranty is provided regarding its functionality or suitability for any particular purpose.
+
+## Contact
+
+For any issues or questions, please open an issue on the GitLab repository or contact me on <a href="https://t.me/paslavskyit">Telegram</a>.
+
+<p align="center">
+  Like this script? <a href="https://www.twitch.tv/tarasavg">Follow my Twitch channel💜</a> or <a href="https://donatello.to/tarasavg">tip some money💸</a>!
+</p>
