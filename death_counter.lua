@@ -7,7 +7,9 @@ increment_hotkey_id = nil
 decrement_hotkey_id = nil
 
 function script_description()
-    return "A script to increment and decrement a death counter and save it persistently."
+    return [[
+        A script to increment and decrement a death counter and save it persistently.
+    ]]
 end
 
 function script_properties()
@@ -17,6 +19,9 @@ function script_properties()
 
     obs.obs_properties_add_text(props, "prefix", "Prefix Text", obs.OBS_TEXT_DEFAULT)
     obs.obs_properties_add_int(props, "count", "Death Count", 0, 1000000, 1)
+
+    local support_text = obs.obs_properties_add_text(props, "support", "Support", obs.OBS_TEXT_INFO)
+    obs.obs_property_set_description(support_text, "Like this script? <a href='https://www.twitch.tv/tarasavg'>Follow my Twitch channel💜 </a> or <a href='https://donatello.to/tarasavg'>tip some money💸</a>!")
 
     return props
 end

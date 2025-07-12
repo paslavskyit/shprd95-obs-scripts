@@ -72,4 +72,8 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-For any issues or questions, please open an issue on the GitLab repository or contact me on Telegram. Click >> ![Icon from FlatIcons](https://www.flaticon.com/premium-icon/icons/svg/Telegram_Logo.png).
+For any issues or questions, please open an issue on the GitLab repository or contact me on <a href="https://t.me/paslavskyit">Telegram</a>.
+
+<p align="center">
+  Like this script? <a href="https://www.twitch.tv/tarasavg">Follow my Twitch channel💜</a> or <a href="https://donatello.to/tarasavg">tip some money💸</a>!
+</p>
